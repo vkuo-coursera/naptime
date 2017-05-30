@@ -100,7 +100,8 @@ class SangriaGraphQlSchemaBuilder(
       val resource = schemaMetadata.getResource(resourceName)
       val fields = resource.handlers.flatMap { handler =>
         handler.kind match {
-          case HandlerKind.GET =>
+          // We want to make sure that if a resource has a GET handler, it also has a MULTI_GET handler
+          case HandlerKind.GET if resource.handlers.exists(_.kind == HandlerKind.MULTI_GET) =>
             generateGetHandler(resource, handler)
           case HandlerKind.GET_ALL | HandlerKind.MULTI_GET | HandlerKind.FINDER =>
             generateListHandler(resource, handler)
